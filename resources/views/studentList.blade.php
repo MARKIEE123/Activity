@@ -5,8 +5,9 @@
 <div>
     <!-- Display Status Message -->
     @if(session('success'))
-    <div class="alert alert-success" id="success">
-        {{ Session::get('success') }}
+    <div id="alertBox" class="alert alert-success position-fixed top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index: 1050;">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
 
@@ -17,7 +18,7 @@
     @endif
 
     <!-- Display Student Lists Table -->
-    <div class="container">
+    <div class="container mt-5">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -29,7 +30,7 @@
                             </button>
                     </div>
                     <div class="card-body">
-                        <table class="table table-bordered">
+                        <table class="table table-bordered text-center">
                             <thead>
                                 <tr>
                                     <th style="text-align: center;">ID</th>
@@ -41,10 +42,52 @@
                             <tbody>
                                 @foreach($students as $student)
                                 <tr>
-                                    <td style="text-align: center;">{{ $student->id }}</td>
-                                    <td style="text-align: center;">{{ $student->name }}</td>
-                                    <td style="text-align: center;">{{ $student->age }}</td>
+                                    <td>{{ $student->id }}</td>
+                                    <td>{{ $student->name }}</td>
+                                    <td>{{ $student->age }}</td>
+                                    <td>
+                                        <form action="{{ route('std.destroy', $student)}}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <span class="material-symbols-outlined">delete</span>
+                                        </button>
+                                        </form>
+                                        
+                                        <button class="btn btn-info btn-sm text-light" data-bs-toggle="modal" data-bs-target="#editStudentModal{{ $student->id }}">
+                                            <span class="material-symbols-outlined">edit</span>
+                                        </button>
+                                    </td>
                                 </tr>
+
+                                <div class="modal fade" id="editStudentModal{{ $student->id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <form action="{{ route('std.edit', $student->id) }}" method="POST">
+                                            @csrf
+                                            @method('PUT')
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Edit Student</h5>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Name</label>
+                                                        <input type="text" class="form-control" name="stdName" value="{{ $student->name }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Age</label>
+                                                        <input type="number" class="form-control" name="stdAge" value="{{ $student->age }}" required>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-success">Save Changes</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
                                 @endforeach
                             </tbody>
                         </table>
